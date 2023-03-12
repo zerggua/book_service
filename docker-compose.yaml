@@ -1,0 +1,34 @@
+
+services:
+
+  db:
+    command: --default-authentication-plugin=mysql_native_password
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 11120408
+    # ports:
+    #   - 3306:3306
+    volumes:
+      - ./test.schema.sql:/docker-entrypoint-initdb.d/base.sql
+  api:
+    image: node
+    ports:
+      - 8800:8800
+    volumes:
+      - ./backend:/api
+    working_dir: /api
+    command: bash -c "npm install && npm run start"
+    depends_on:
+      - db
+  client:
+    image: node
+    ports:
+      - 3000:3000
+    volumes:
+      - ./ui:/app
+    working_dir: /app
+    command: bash -c "npm install && npm run start"
+    depends_on:
+      - api
+    
